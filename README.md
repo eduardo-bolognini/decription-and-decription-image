@@ -12,6 +12,11 @@ Make your own goddamn conclusions.
 
 Long live the European Union that shoves privacy front and center, bleeding out every programmer with the GDPR just to set up a simple  blog... but then, when it comes to scanning your private messages and handing everything over to a private firm, suddenly privacy can go fuck itself.
 
+Try at: 
+- Encription: https://eduardo-bolognini.github.io/decription-and-decription-image/encript.html
+- Decription: https://eduardo-bolognini.github.io/decription-and-decription-image/decription.html 
+
+
 🇮🇹 Traduzione in italiano - translation in italian:
 
 Tra i mille motivi che dimostrano quanto il chat control sia una stupidaggine colossale partorita da un branco di idioti patentati nell’Unione Europea, c’è che con un banale servizio browser – tipo questo schifo di 200 linee di codice – puoi prendere un’immagine, trasformarla in rumore puro con la crittografia AES-GCM, e spedire l'immagine criptata e una chiave per decifrarla. Il ricevente, usando lo stesso sito del cazzo (o anche una copia locale), inserisce la chiave e puff: l’immagine torna visibile. Quindi ricapitolando:
@@ -24,3 +29,7 @@ Quindi qual è il vero obiettivo dell’Unione Europea?
 Proteggere i bambini o scippare i nostri dati per rivenderli al miglior offerente? E tenete bene a mente: questo progetto non lo implementerà un team di programmatori UE con codice open source, ma una fottuta azienda privata.Fate voi le vostre puttane considerazioni.
 
 Viva l’Unione Europea che sbatte la privacy in prima fila, strozzando a sangue ogni programmatore con il GDPR solo per tirare su un semplice blog... ma poi, quando si tratta di scansionare i tuoi messaggi privati e affidare tutto a una ditta privata, improvvisamente la privacy può andare a farsi fottere.
+
+Prova a: 
+- Cripta: https://eduardo-bolognini.github.io/decription-and-decription-image/encript.html
+- Decripta: https://eduardo-bolognini.github.io/decription-and-decription-image/decription.html 
