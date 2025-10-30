@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Encrypt image (nonce included)</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --card: #111827;
+      --fg: #e5e7eb;
+      --muted: #9ca3af;
+      --primary: #6366f1;
+      --primary-600: #5457ee;
+      --ring: rgba(99, 102, 241, 0.35);
+      --success: #22c55e;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Ubuntu, "Helvetica Neue", Arial, system-ui, sans-serif;
+      color: var(--fg);
+      background: radial-gradient(1200px 600px at 20% -20%, #1f2937 0%, transparent 60%),
+                  radial-gradient(1000px 600px at 120% 0%, #1e293b 0%, transparent 60%),
+                  var(--bg);
+    }
+    .wrap {
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 820px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))
+                  padding-box,
+                  linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06))
+                  border-box;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      padding: 24px;
+      backdrop-filter: blur(6px);
+    }
+    header h1 {
+      margin: 0 0 4px;
+      font-size: 22px;
+      letter-spacing: 0.2px;
+    }
+    header p { margin: 0; color: var(--muted); font-size: 14px; }
+    .row { display: grid; gap: 12px; grid-template-columns: 1fr auto; align-items: center; margin-top: 18px; }
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; }
+    label.small { color: var(--muted); font-size: 12px; }
+    input[type="file"] {
+      color: var(--fg);
+      background: var(--bg-soft);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 10px;
+      width: 100%;
+    }
+    button, .btn-link {
+      appearance: none;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 600;
+      color: white;
+      background: var(--primary);
+      cursor: pointer;
+      transition: transform 0.06s ease, background 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 6px 16px rgba(99,102,241,0.35);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    button:hover, .btn-link:hover { background: var(--primary-600); transform: translateY(-1px); }
+    button.secondary { background: #374151; box-shadow: none; }
+    button.secondary:hover { background: #3f4756; }
+    .meta { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin: 14px 0 0; }
+    .badge { background: rgba(99,102,241,0.18); color: #c7d2fe; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+    .keybox { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; margin-top: 10px; }
+    .keytext { background: var(--bg-soft); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 12px; color: #d1d5db; word-break: break-all; }
+    .canvas-wrap { margin-top: 16px; background: repeating-conic-gradient(from 45deg, #1f2937 0 12px, #111827 0 24px); padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.06); }
+    canvas { max-width: 100%; display: block; background: #0b1020; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06); }
+    footer { margin-top: 18px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .muted { color: var(--muted); font-size: 12px; }
+    .link { color: #93c5fd; text-decoration: none; }
+    .link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <header>
+        <h1>Encrypt image</h1>
+        <p>Upload an image to get an encrypted PNG with nonce included.</p>
+      </header>
+
+      <div class="row">
+        <input type="file" id="imageInput" accept="image/*" />
+        <div class="controls">
+          <button id="encryptButton">Encrypt</button>
+        </div>
+      </div>
+
+      <div class="meta">
+        <span class="badge">Output: <span id="dimsOut">—</span></span>
+        <span class="muted">The key is shown in Base64</span>
+      </div>
+
+      <div class="keybox">
+        <div class="keytext" id="keyOut"></div>
+        <button class="secondary" id="copyKey" title="Copy key">Copy</button>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="outputCanvas"></canvas>
+      </div>
+
+      <footer>
+        <a id="downloadLink" class="btn-link" download="encrypted.png">Download encrypted image</a>
+        <span class="muted">Want to decrypt? <a class="link" href="decript.html">Go to Decrypt</a></span>
+      </footer>
+    </section>
+  </div>
+
+  <script>
+    function imageDataToRGBBytes(imageData) {
+      const d = imageData.data;
+      const out = new Uint8Array(imageData.width * imageData.height * 3);
+      let j = 0;
+      for (let i = 0; i < d.length; i += 4) {
+        out[j++] = d[i];
+        out[j++] = d[i + 1];
+        out[j++] = d[i + 2];
+      }
+      return out;
+    }
+
+    function bytesToImageData(bytes, width, height) {
+      const imgData = new ImageData(width, height);
+      let j = 0;
+      for (let i = 0; i < imgData.data.length; i += 4) {
+        imgData.data[i]     = bytes[j++] || 0; 
+        imgData.data[i + 1] = bytes[j++] || 0; 
+        imgData.data[i + 2] = bytes[j++] || 0;
+        imgData.data[i + 3] = 255;             
+      }
+      return imgData;
+    }
+
+    async function encryptAESGCM(data) {
+      const key = await crypto.subtle.generateKey(
+        { name: "AES-GCM", length: 256 },
+        true,
+        ["encrypt", "decrypt"]
+      );
+      const nonce = crypto.getRandomValues(new Uint8Array(12));
+      const ctBuf = await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce }, key, data);
+      return { ciphertext: new Uint8Array(ctBuf), key, nonce };
+    }
+
+    function packPayload(nonce, ciphertext) {
+      const len = ciphertext.length;
+      const payload = new Uint8Array(12 + 4 + len);
+      payload.set(nonce, 0);
+
+      new DataView(payload.buffer).setUint32(12, len, false);
+      payload.set(ciphertext, 16);
+      return payload;
+    }
+
+    function paintBytesToCanvas(bytes, outCanvas, fixedWidth) {
+      const width = fixedWidth;
+      const bytesPerRow = width * 3;
+      const totalRows = Math.ceil(bytes.length / bytesPerRow);
+      outCanvas.width = width;
+      outCanvas.height = totalRows;
+      const ctx = outCanvas.getContext("2d");
+      const imgData = bytesToImageData(bytes, width, totalRows);
+      ctx.putImageData(imgData, 0, 0);
+      return { width, height: totalRows };
+    }
+
+    document.getElementById("encryptButton").onclick = async () => {
+      const file = document.getElementById("imageInput").files[0];
+      if (!file) return alert("Please select an image first.");
+
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = async e => {
+        img.onload = async () => {
+          const tmp = document.createElement("canvas");
+          tmp.width = img.width;
+          tmp.height = img.height;
+          const tctx = tmp.getContext("2d");
+          tctx.drawImage(img, 0, 0);
+          const src = tctx.getImageData(0, 0, img.width, img.height);
+          const plainRGB = imageDataToRGBBytes(src);
+
+          const { ciphertext, key, nonce } = await encryptAESGCM(plainRGB);
+          const payload = packPayload(nonce, ciphertext);
+
+          const outCanvas = document.getElementById("outputCanvas");
+          const dims = paintBytesToCanvas(payload, outCanvas, img.width);
+          document.getElementById("dimsOut").textContent = `${dims.width}×${dims.height}`;
+
+          const dataURL = outCanvas.toDataURL("image/png");
+          document.getElementById("downloadLink").href = dataURL;
+
+          const rawKey = await crypto.subtle.exportKey("raw", key);
+          const keyB64 = btoa(String.fromCharCode(...new Uint8Array(rawKey)));
+          document.getElementById("keyOut").textContent = keyB64;
+
+          console.log("Nonce (12 byte):", Array.from(nonce));
+          console.log("Ciphertext length:", ciphertext.length);
+          console.log("Output canvas:", dims);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    document.getElementById('copyKey').addEventListener('click', async () => {
+      const key = document.getElementById('keyOut').textContent.trim();
+      if (!key) return alert('No key to copy.');
+      try {
+        await navigator.clipboard.writeText(key);
+        const btn = document.getElementById('copyKey');
+        const old = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.style.background = 'rgba(34,197,94,0.28)';
+        setTimeout(() => { btn.textContent = old; btn.style.background = ''; }, 1200);
+      } catch (e) {
+        alert('Unable to copy automatically. Please copy the key manually.');
+      }
+    });
+  </script>
+</body>
+</html>
