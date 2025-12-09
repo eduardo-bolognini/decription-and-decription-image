@@ -12,8 +12,8 @@ Long live the European Union that shoves privacy front and center, bleeding out 
 
   
 Try at:  
-- [Encryption page](https://eduardo-bolognini.github.io/decription-and-decription-image/encript.html)  
-- [Decryption page](https://eduardo-bolognini.github.io/decription-and-decription-image/decription.html)
+- [Encryption page](https://eduardo-bolognini.github.io/decription-and-encription-image/encript.html)  
+- [Decryption page](https://eduardo-bolognini.github.io/decription-and-encription-image/decription.html)
   
 🇮🇹 Traduzione in italiano - translation in italian:
 
@@ -29,5 +29,5 @@ Quindi qual è il vero obiettivo dell’Unione Europea? Proteggere i bambini o s
 Viva l’Unione Europea che sbatte la privacy in prima fila, strozzando a sangue ogni programmatore con il GDPR solo per tirare su un semplice blog... ma poi, quando si tratta di scansionare i tuoi messaggi privati e affidare tutto a una ditta privata, improvvisamente la privacy può andare a farsi fottere.
 
 Prova a:
-- [Cripta](https://eduardo-bolognini.github.io/decription-and-decription-image/encript.html)  
-- [Decripta](https://eduardo-bolognini.github.io/decription-and-decription-image/decription.html) 
+- [Cripta](https://eduardo-bolognini.github.io/decription-and-encription-image/encript.html)  
+- [Decripta](https://eduardo-bolognini.github.io/decription-and-encription-image/decription.html) 
